@@ -138,21 +138,55 @@ test_bool_type_2 =
   Program [] $
   ENot (EIntLit 42)
 
+types_programs = 
+  [
+  EBoolLit True,
+  EBoolLit False,
+  EIntLit 1,
+  EIntLit (-1),
+  ELambda ("x",TInt) (EAdd (EVar "x") (EIntLit 1)),
+  EApply (ELambda ("x",TBool) (ENot (EVar "x"))) (EBoolLit True),
+  EApply (ELambda ("x",TInt) (EAdd (EVar "x") (EIntLit 1))) (EIntLit 1)
+  ]
+
+values_programs = 
+  [
+  EBoolLit True,
+  EBoolLit False,
+  EIntLit 1,
+  EIntLit (-1),
+  EAnd (EBoolLit True) (EBoolLit False),
+  EAdd (EIntLit 1) (EIntLit 2),
+  EDiv (EIntLit 10) (EIntLit 2),
+  EEq (EIntLit 1) (EIntLit 2),
+  ENeq (EIntLit 1) (EIntLit 2),
+  EIf (EBoolLit True) (EIntLit 1) (EIntLit 2),
+  ELet ("a", (EIntLit 1)) (EAdd (EVar "a") (EIntLit 1)),
+  EApply (ELambda ("x",TInt) (EAdd (EVar "x") (EIntLit 1))) (EIntLit 1)
+  ]
+
+types = map evalType $ map (\x -> Program [] x) types_programs
+values = map evalValue $ map (\x -> Program [] x) values_programs
 
 main :: IO ()
 main = do
-  putStrLn " ---------- make `stack test` looks prettier ----------"
-  print $ EvalValue.evalValue test_bool_value -- should be: RBool True
+  putStrLn ""
+  putStrLn " ---------- My Test Cases ----------"
+  putStrLn (show types)
+  putStrLn (show values)
+
+  -- putStrLn " ---------- make `stack test` looks prettier ----------"
+  -- print $ EvalValue.evalValue test_bool_value -- should be: RBool True
   print $ EvalType.evalType test_bool_type_1 -- should be: Just TBool
   print $ EvalType.evalType test_bool_type_2 -- should be: Nothing
   
-  print $ EvalValue.evalValue test_fbi
-  print $ EvalValue.evalValue test_sum3
-  print $ EvalValue.evalValue test_adt_ctor
-  print $ EvalValue.evalValue test_adt_case
-  print $ EvalValue.evalProgram test_adt_list
-  print $ EvalValue.evalProgram test_adt_list_range
-  print $ EvalValue.evalValue test_adt_list_sum
+  -- print $ EvalValue.evalValue test_fbi
+  -- print $ EvalValue.evalValue test_sum3
+  -- print $ EvalValue.evalValue test_adt_ctor
+  -- print $ EvalValue.evalValue test_adt_case
+  -- print $ EvalValue.evalProgram test_adt_list
+  -- print $ EvalValue.evalProgram test_adt_list_range
+  -- print $ EvalValue.evalValue test_adt_list_sum
   print $ EvalType.evalType test_fbi
   print $ EvalType.evalType test_sum3
   print $ EvalType.evalType test_adt_ctor
@@ -161,3 +195,5 @@ main = do
   print $ EvalType.evalType test_adt_list_range
   print $ EvalType.evalType test_adt_list_sum
   print $ EvalType.evalType test_type
+
+  
