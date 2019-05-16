@@ -11,7 +11,7 @@ data Value
   = VBool Bool
   | VInt Int
   | VChar Char
-  | VFunc String Expr -- 函数类型，记录第一个参数的参数名和函数体
+  | VFunc String Expr Context -- 函数类型，记录第一个参数的参数名和函数体，以及当前参数绑定状态（函数闭包）
   -- ... more
   deriving (Show, Eq)
 
@@ -180,7 +180,8 @@ eval (EIf a b c) = do
       return vtarget
     _ -> lift Nothing
 eval (ELambda (s, t) e) = do
-  return $ VFunc s e
+  context <- get
+  return $ VFunc s e context
 eval (ELet (s, a) b) = do
   va <- eval a
   context <- get
@@ -190,7 +191,7 @@ eval (ELet (s, a) b) = do
   return vb
 eval (ELetRec func (arg, targ) (e, te) exp) = do
   context <- get
-  put (insertValueMap context func $ VFunc arg e)
+  put (insertValueMap context func $ VFunc arg e context)
   vexp <- eval exp
   put context
   return vexp
@@ -203,11 +204,13 @@ eval (EApply a b) = do
   vb <- eval b
   va <- eval a
   case va of
-    VFunc s e -> do
-      context <- get
+    VFunc s e context -> do
+      old_context <- get
       put (insertValueMap context s vb)
+      new_context <- get
+      put $ unionWith (++) new_context old_context
       ve <- eval e
-      put context
+      put old_context
       return ve
     _ -> lift Nothing
 eval (ECase e pes) = do
