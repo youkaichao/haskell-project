@@ -191,9 +191,9 @@ eval (ELet (s, a) b) = do
 eval (ELetRec func (arg, targ) (e, te) exp) = do
   context <- get
   put (insertValueMap context func $ VFunc arg e)
-  ve <- eval e
+  vexp <- eval exp
   put context
-  return ve
+  return vexp
 eval (EVar s) = do
   context <- get
   case findValueMap context s of 
@@ -238,6 +238,7 @@ evalPE m srcValue (done, v) p e
     PVar destVar -> (True, evalStateT (eval e) (insertValueMap m destVar srcValue))
     _ -> (True, Nothing) -- TODO 代数数据类型，不支持
 
+evalExprValue e = runStateT (eval e) empty
 
 evalProgram :: Program -> Maybe Value
 evalProgram (Program adts body) = evalStateT (eval body) empty

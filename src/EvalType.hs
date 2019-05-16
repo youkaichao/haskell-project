@@ -116,7 +116,6 @@ eval (EApply a b) = do
   case ta of
     TArrow tt1 tt2 -> if tt1 == tb then return tt2 else lift Nothing
     _ -> lift Nothing
-  return tb
 eval (ELetRec func (arg, targ) (e, te) exp) = do
   context <- get
   put $ insertTypeMap (insertTypeMap context func (TArrow targ te)) arg targ
@@ -148,6 +147,9 @@ evalPE m t p e = case p of
   PCharLit _ -> if t == TChar then evalStateT (eval e) m else Nothing
   PVar name -> evalStateT (eval e) (insertTypeMap m name t)
   PData name ps -> Nothing -- TODO
+
+evalExprType :: Expr -> Maybe Type
+evalExprType e = evalType (Program [] e)
 
 evalType :: Program -> Maybe Type
 evalType (Program adts body) = evalStateT (eval body) $ empty -- 可以用某种方式定义上下文，用于记录变量绑定状态

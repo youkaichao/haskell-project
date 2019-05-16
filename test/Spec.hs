@@ -16,12 +16,7 @@ callFun f (e:es) = callFun (EApply f e) es
 
 test_sum3 =
   Program [] $
-
-  makeFun ("sum3", TInt) [("x", TInt), ("y", TInt), ("z", TInt)] (
-  EAdd (EAdd (EVar "x") (EVar "y")) (EVar "z")
-  ) $
-
-  callFun (EVar "sum3") [EIntLit 1, EIntLit 2, EIntLit 3]
+  makeFun ("sum3", TInt) [("x", TInt), ("y", TInt), ("z", TInt)] (EAdd (EAdd (EVar "x")(EVar "y")) (EVar "z")) $ callFun (EVar "sum3") [EIntLit 1, EIntLit 2, EIntLit 3]
 
 test_fbi =
   Program [] $
@@ -121,7 +116,7 @@ test_adt_list_sum =
 test_type =
   Program [] $
   ECase (EBoolLit True)
-  [ (PBoolLit True, ECharLit '2')
+  [ (PBoolLit True, EIntLit 2)
   , (PBoolLit False, EIntLit 1)
   ]
 
@@ -138,18 +133,7 @@ test_bool_type_2 =
   Program [] $
   ENot (EIntLit 42)
 
-types_programs = 
-  [
-  EBoolLit True,
-  EBoolLit False,
-  EIntLit 1,
-  EIntLit (-1),
-  ELambda ("x",TInt) (EAdd (EVar "x") (EIntLit 1)),
-  EApply (ELambda ("x",TBool) (ENot (EVar "x"))) (EBoolLit True),
-  EApply (ELambda ("x",TInt) (EAdd (EVar "x") (EIntLit 1))) (EIntLit 1)
-  ]
-
-values_programs = 
+programs = 
   [
   EBoolLit True,
   EBoolLit False,
@@ -162,11 +146,26 @@ values_programs =
   ENeq (EIntLit 1) (EIntLit 2),
   EIf (EBoolLit True) (EIntLit 1) (EIntLit 2),
   ELet ("a", (EIntLit 1)) (EAdd (EVar "a") (EIntLit 1)),
+  EApply (ELambda ("x",TBool) (ENot (EVar "x"))) (EBoolLit True),
   EApply (ELambda ("x",TInt) (EAdd (EVar "x") (EIntLit 1))) (EIntLit 1)
   ]
 
-types = map evalType $ map (\x -> Program [] x) types_programs
-values = map evalValue $ map (\x -> Program [] x) values_programs
+expected_types = 
+  [
+
+  ]
+
+expected_values = 
+  [
+
+  ]
+
+func (eachT, program) = case eachT of 
+  Just x -> evalValue (Program [] program) -- well typed, 求值
+  Nothing -> RInvalid
+
+types = map evalType $ map (\x -> Program [] x) programs
+values = map func $ zip types programs
 
 main :: IO ()
 main = do
@@ -175,13 +174,13 @@ main = do
   putStrLn (show types)
   putStrLn (show values)
 
-  -- putStrLn " ---------- make `stack test` looks prettier ----------"
-  -- print $ EvalValue.evalValue test_bool_value -- should be: RBool True
+  putStrLn " ---------- make `stack test` looks prettier ----------"
+  print $ EvalValue.evalValue test_bool_value -- should be: RBool True
   print $ EvalType.evalType test_bool_type_1 -- should be: Just TBool
   print $ EvalType.evalType test_bool_type_2 -- should be: Nothing
   
-  -- print $ EvalValue.evalValue test_fbi
-  -- print $ EvalValue.evalValue test_sum3
+  print $ EvalValue.evalValue test_fbi
+  print $ EvalValue.evalValue test_sum3
   -- print $ EvalValue.evalValue test_adt_ctor
   -- print $ EvalValue.evalValue test_adt_case
   -- print $ EvalValue.evalProgram test_adt_list
@@ -189,11 +188,11 @@ main = do
   -- print $ EvalValue.evalValue test_adt_list_sum
   print $ EvalType.evalType test_fbi
   print $ EvalType.evalType test_sum3
-  print $ EvalType.evalType test_adt_ctor
-  print $ EvalType.evalType test_adt_case
-  print $ EvalType.evalType test_adt_list
-  print $ EvalType.evalType test_adt_list_range
-  print $ EvalType.evalType test_adt_list_sum
+  -- print $ EvalType.evalType test_adt_ctor
+  -- print $ EvalType.evalType test_adt_case
+  -- print $ EvalType.evalType test_adt_list
+  -- print $ EvalType.evalType test_adt_list_range
+  -- print $ EvalType.evalType test_adt_list_sum
   print $ EvalType.evalType test_type
 
   
