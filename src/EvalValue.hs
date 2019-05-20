@@ -99,6 +99,14 @@ eval (EDiv a b) = do
                       VInt realVb -> if realVb == 0 then lift Nothing else return (VInt (div realVa realVb))
                       _ -> lift Nothing
     _ -> lift Nothing
+eval (EMod a b) = do
+  va <- eval a
+  vb <- eval b
+  case va of 
+    VInt realVa -> case vb of
+                      VInt realVb -> if realVb == 0 then lift Nothing else return (VInt (mod realVa realVb))
+                      _ -> lift Nothing
+    _ -> lift Nothing
 eval (EEq a b) =  do
   va <- eval a
   vb <- eval b

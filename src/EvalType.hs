@@ -53,6 +53,7 @@ eval (EAdd a b) = isInt a >> isInt b >> return TInt
 eval (ESub a b) = eval (EAdd a b)
 eval (EMul a b) = eval (EAdd a b)
 eval (EDiv a b) = eval (EAdd a b)
+eval (EMod a b) = eval (EAdd a b)
 eval (EEq a b) =  do
   ta <- eval a
   tb <- eval b
