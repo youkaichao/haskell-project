@@ -25,21 +25,21 @@ eval (ELt a b) =  printf "(%s) < (%s)" (eval a) (eval b)
 eval (EGt a b) =  printf "(%s) > (%s)" (eval a) (eval b)
 eval (ELe a b) =  printf "(%s) <= (%s)" (eval a) (eval b)
 eval (EGe a b) =  printf "(%s) >= (%s)" (eval a) (eval b)
-eval (EIf a b c) = printf "if(%s){%s}else{%s}" (eval a) (eval b) (eval c)
+eval (EIf a b c) = printf "(%s)?(%s):(%s)" (eval a) (eval b) (eval c)
 eval (ELambda (s, t) e) = printf "function (%s) {return (%s)}" s (eval e)
 eval (ELet (s, a) b) = printf "(function (%s) {return (%s)})(%s)" s (eval b) (eval a)
-eval (ELetRec func (arg, targ) (e, te) exp) = printf "(function (%s){return %s})(function (%s){return %s})" func (eval exp) arg (eval e)
+eval (ELetRec func (arg, targ) (e, te) exp) = printf "(function (%s){return %s})(function %s(%s){return %s})" func (eval exp) func arg (eval e)
 eval (EVar s) = s
 eval (EApply a b) = printf "(%s)(%s)" (eval a) (eval b)
-eval (ECase e pes) = let tmp_name = "$_tmp" in printf "{%s=(%s);%s}" tmp_name (eval e) (concat $ pattern tmp_name pes)
+eval (ECase e pes) = let tmp_name = "$_tmp" in printf "{%s=(%s);%s}" tmp_name (eval e) (pattern tmp_name pes)
 
-pattern :: [Char] -> [(Pattern, Expr)] -> [[Char]]
-pattern tmp_name [] = ["{undefined}"]
+pattern :: [Char] -> [(Pattern, Expr)] -> [Char]
+pattern tmp_name [] = "undefined"
 pattern tmp_name ((p, e):xs) = case p of
-  PBoolLit b -> (printf "if(%s===%s){%s}else " tmp_name (if b then "true" else "false") (eval e)) : pattern tmp_name xs
-  PIntLit b -> (printf "if(%s===%s){%s}else " tmp_name (show b) (eval e)) : pattern tmp_name xs
-  PCharLit b -> (printf "if(%s===%s){%s}else " tmp_name (b:[]) (eval e)) : pattern tmp_name xs
-  PVar b -> (printf "if(%s===%s){%s=%s;%s}else " tmp_name tmp_name b tmp_name (eval e)) : pattern tmp_name xs
+  PBoolLit b -> printf "(%s===%s)?(%s):(%s)" tmp_name (if b then "true" else "false") (eval e) (pattern tmp_name xs)
+  PIntLit b -> printf "(%s===%s)?(%s):(%s)" tmp_name (show b) (eval e) (pattern tmp_name xs)
+  PCharLit b -> printf "(%s===%s)?(%s):(%s)" tmp_name (b:[]) (eval e) (pattern tmp_name xs)
+  PVar b -> printf "(%s===%s)?(%s):(%s)" tmp_name tmp_name b tmp_name (eval e) (pattern tmp_name xs)
     
 
 evalJS :: Program -> String
