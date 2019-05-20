@@ -39,7 +39,7 @@ pattern tmp_name ((p, e):xs) = case p of
   PBoolLit b -> printf "(%s===%s)?(%s):(%s)" tmp_name (if b then "true" else "false") (eval e) (pattern tmp_name xs)
   PIntLit b -> printf "(%s===%s)?(%s):(%s)" tmp_name (show b) (eval e) (pattern tmp_name xs)
   PCharLit b -> printf "(%s===%s)?(%s):(%s)" tmp_name (b:[]) (eval e) (pattern tmp_name xs)
-  PVar b -> printf "(%s===%s)?(%s):(%s)" tmp_name tmp_name b tmp_name (eval e) (pattern tmp_name xs)
+  PVar b -> printf "(%s===%s)?(function (%s){return %s})(%s):(%s)" tmp_name tmp_name b (eval e) tmp_name (pattern tmp_name xs)
     
 
 evalJS :: Program -> String
