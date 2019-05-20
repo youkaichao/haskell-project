@@ -30,6 +30,7 @@ library
       AST
       EvalType
       EvalValue
+      EvalJS
   other-modules:
       Paths_fpproject
   hs-source-dirs:
