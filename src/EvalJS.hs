@@ -10,7 +10,7 @@ import qualified EvalType
 eval :: Expr -> String
 eval (EBoolLit b) = if b then "true" else "false"
 eval (EIntLit b) = show b
-eval (ECharLit b) = b:[]
+eval (ECharLit b) = "'" ++ (b:[]) ++"'"
 eval (ENot e) = printf "! %s" $ eval e
 eval (EAnd a b) = printf "!!(%s) && !!(%s)" (eval a) (eval b)
 eval (EOr a b) = printf "!!(%s) || !!(%s)" (eval a) (eval b)
