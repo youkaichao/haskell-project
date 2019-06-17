@@ -26,7 +26,7 @@ eval (EGt a b) =  printf "(%s) > (%s)" (eval a) (eval b)
 eval (ELe a b) =  printf "(%s) <= (%s)" (eval a) (eval b)
 eval (EGe a b) =  printf "(%s) >= (%s)" (eval a) (eval b)
 eval (EIf a b c) = printf "(%s)?(%s):(%s)" (eval a) (eval b) (eval c)
-eval (ELambda (s, t) e) = printf "function (%s) {return (%s)}" s (eval e)
+eval (ELambda (s, t) e) = printf "(function (%s) {return (%s)})" s (eval e)
 eval (ELet (s, a) b) = printf "(function (%s) {return (%s)})(%s)" s (eval b) (eval a)
 eval (ELetRec func (arg, targ) (e, te) exp) = printf "(function (%s){return %s})(function %s(%s){return %s})" func (eval exp) func arg (eval e)
 eval (EVar s) = s
